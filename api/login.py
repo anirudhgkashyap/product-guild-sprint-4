@@ -1,108 +1,24 @@
-"""
-login.py — authentication endpoints for the frontend.
-
-Supabase Auth remains the source of truth for authentication.
-This module simply provides FastAPI endpoints that the frontend
-can use to sign users in / sign users up.
-"""
-
 import os
+from fastapi import APIRouter, HTTPException, status
+from gotrue.errors import AuthApiError
+from supabase import Client, create_client
 
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from supabase import create_client
+# 1. Instantiate client globally to reuse connection pooling
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_PUBLISHABLE_KEY = os.getenv("SUPABASE_PUBLISHABLE_KEY")
 
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
 
-router = APIRouter(prefix="/api/auth", tags=["auth"])
-
-
-SUPABASE_URL = os.environ["SUPABASE_URL"]
-SUPABASE_PUBLISHABLE_KEY = os.environ["SUPABASE_PUBLISHABLE_KEY"]
-
-
-# -------------------------------------------------------------------
-# Request models
-# -------------------------------------------------------------------
-
-class LoginRequest(BaseModel):
-    email: str
-    password: str
+router = APIRouter()
 
 
-class SignupRequest(BaseModel):
-    email: str
-    password: str
-    full_name: str
-
-
-# -------------------------------------------------------------------
-# Login
-# -------------------------------------------------------------------
-
-@router.post("/login")
-def login(payload: LoginRequest):
-    """
-    Authenticate a user through Supabase Auth.
-
-    The returned access_token is the JWT that the frontend should
-    send to protected FastAPI endpoints using:
-
-        Authorization: Bearer <access_token>
-    """
-
-    try:
-        supabase = create_client(
-            SUPABASE_URL,
-            SUPABASE_PUBLISHABLE_KEY,
-        )
-
-        response = supabase.auth.sign_in_with_password(
-            {
-                "email": payload.email,
-                "password": payload.password,
-            }
-        )
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=401,
-            detail=f"Supabase login error: {str(e)}",
-        )
-
-    if response.user is None or response.session is None:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid email or password",
-        )
-
-    return {
-        "user": {
-            "id": response.user.id,
-            "email": response.user.email,
-        },
-        "access_token": response.session.access_token,
-        "refresh_token": response.session.refresh_token,
-    }
-
-
-# -------------------------------------------------------------------
-# Signup
-# -------------------------------------------------------------------
-
-@router.post("/signup")
+@router.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(payload: SignupRequest):
     """
     Create a new Supabase Auth user.
     """
-
     try:
-        # Step 1: create Supabase client
-        supabase = create_client(
-            SUPABASE_URL,
-            SUPABASE_PUBLISHABLE_KEY,
-        )
-
-        # Step 2: contact Supabase Auth
+        # Step 1: Call Supabase Auth
         response = supabase.auth.sign_up(
             {
                 "email": payload.email,
@@ -115,13 +31,14 @@ def signup(payload: SignupRequest):
             }
         )
 
-        # Step 3: verify response
+        # Step 2: Verify user returned
         if response.user is None:
             raise HTTPException(
-                status_code=400,
-                detail="Supabase returned no user",
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Failed to register user.",
             )
 
+        # Step 3: Format response
         result = {
             "user": {
                 "id": response.user.id,
@@ -138,11 +55,19 @@ def signup(payload: SignupRequest):
 
         return result
 
+    except AuthApiError as e:
+        # Step 4: Handle specific Supabase Auth errors (400 level)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=e.message,
+        )
+
     except HTTPException:
         raise
 
-    except Exception as e:
+    except Exception:
+        # Step 5: Catch unexpected server errors without exposing internal stack trace
         raise HTTPException(
-            status_code=500,
-            detail=f"SIGNUP DEBUG ERROR: {type(e).__name__}: {str(e)}",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An internal error occurred during sign up.",
         )
