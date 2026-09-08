@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sign in — Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="login-shell">
+    <div class="login-brand">
+      <div class="mark-row"><span class="mark"></span>PLATFORM</div>
+      <div class="pitch">
+        <h1>Every redline, every version, every signature — in one thread.</h1>
+        <p>Track contract negotiations the way engineers track code: commit versions, compare redlines side by side, and keep an audit trail neither side can dispute.</p>
+        <div class="flow">
+          <span>Login</span><span>Dashboard</span><span>Version Timeline</span><span>Compare</span><span>E-signature</span>
+        </div>
+      </div>
+      <div class="foot">Contract Negotiation Platform · MVP</div>
+    </div>
+
+    <div class="login-form-side">
+      <div class="login-form-wrap">
+        <div class="auth-toggle">
+          <button type="button" class="active" data-mode="login">Sign in</button>
+          <button type="button" data-mode="signup">Create account</button>
+        </div>
+
+        <div id="login-panel">
+          <h2>Welcome back</h2>
+          <p class="sub">Sign in to pick up where you left off.</p>
+          <form id="login-form">
+            <div class="field">
+              <label for="login-email">Work email</label>
+              <input type="email" id="login-email" required autocomplete="email" placeholder="you@lawfirm.com" />
+            </div>
+            <div class="field">
+              <label for="login-password">Password</label>
+              <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••" />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="login-submit">Sign in</button>
+            <div class="error-text" id="login-error" style="display:none;"></div>
+          </form>
+        </div>
+
+        <div id="signup-panel" style="display:none;">
+          <h2>Create your account</h2>
+          <p class="sub">Set up access for you and your matters.</p>
+          <form id="signup-form">
+            <div class="field">
+              <label for="signup-name">Full name</label>
+              <input type="text" id="signup-name" required autocomplete="name" placeholder="Jane Smith" />
+            </div>
+            <div class="field">
+              <label for="signup-email">Work email</label>
+              <input type="email" id="signup-email" required autocomplete="email" placeholder="you@lawfirm.com" />
+            </div>
+            <div class="field">
+              <label for="signup-password">Password</label>
+              <input type="password" id="signup-password" required autocomplete="new-password" minlength="8" placeholder="At least 8 characters" />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="signup-submit">Create account</button>
+            <div class="error-text" id="signup-error" style="display:none;"></div>
+            <div class="hint" id="signup-notice" style="display:none; margin-top:12px;"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script>
+    // Already signed in? Skip straight to the dashboard.
+    if (Auth.getToken()) window.location.href = "dashboard.html";
+
+    const loginPanel = document.getElementById("login-panel");
+    const signupPanel = document.getElementById("signup-panel");
+    document.querySelectorAll(".auth-toggle button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".auth-toggle button").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const isLogin = btn.dataset.mode === "login";
+        loginPanel.style.display = isLogin ? "" : "none";
+        signupPanel.style.display = isLogin ? "none" : "";
+      });
+    });
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errEl = document.getElementById("login-error");
+      const btn = document.getElementById("login-submit");
+      errEl.style.display = "none";
+      btn.disabled = true;
+      btn.textContent = "Signing in…";
+      try {
+        const email = document.getElementById("login-email").value.trim();
+        const password = document.getElementById("login-password").value;
+        const res = await Api.login(email, password);
+        Auth.setSession(res.user, res.access_token, res.refresh_token);
+        window.location.href = "dashboard.html";
+      } catch (err) {
+        errEl.textContent = err.message || "Couldn't sign in. Check your email and password.";
+        errEl.style.display = "block";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Sign in";
+      }
+    });
+
+    document.getElementById("signup-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errEl = document.getElementById("signup-error");
+      const notice = document.getElementById("signup-notice");
+      const btn = document.getElementById("signup-submit");
+      errEl.style.display = "none";
+      notice.style.display = "none";
+      btn.disabled = true;
+      btn.textContent = "Creating account…";
+      try {
+        const full_name = document.getElementById("signup-name").value.trim();
+        const email = document.getElementById("signup-email").value.trim();
+        const password = document.getElementById("signup-password").value;
+        const res = await Api.signup(email, password, full_name);
+        if (res.access_token) {
+          Auth.setSession(res.user, res.access_token, res.refresh_token);
+          window.location.href = "dashboard.html";
+        } else {
+          notice.textContent = "Account created. Check your email to confirm, then sign in.";
+          notice.style.display = "block";
+        }
+      } catch (err) {
+        errEl.textContent = err.message || "Couldn't create that account.";
+        errEl.style.display = "block";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Create account";
+      }
+    });
+  </script>
+</body>
+</html>

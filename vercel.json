@@ -1,0 +1,10 @@
+{
+  "builds": [
+    { "src": "api/main.py", "use": "@vercel/python", "config": { "includeFiles": "docx_parser/**" } },
+    { "src": "front_end/**", "use": "@vercel/static" }
+  ],
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/main.py" },
+    { "source": "/(.*)", "destination": "/front_end/$1" }
+  ]
+}

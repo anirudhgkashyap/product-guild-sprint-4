@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Active Negotiations — Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <nav class="sidebar" id="sidebar"></nav>
+
+    <div>
+      <div class="topbar">
+        <input class="search-input" id="search-input" type="text" placeholder="Search negotiations, counterparties…" />
+        <div class="topbar-spacer"></div>
+        <button class="btn btn-primary" id="new-negotiation-btn">+ New Negotiation</button>
+        <button class="icon-btn" title="Notifications">🔔</button>
+      </div>
+
+      <main class="main">
+        <div class="page-header">
+          <h1 class="page-title">Active Negotiations</h1>
+          <p class="page-subtitle">Every matter you're a party to, with live status and last activity.</p>
+        </div>
+
+        <div class="tabbar" id="tabbar">
+          <button class="tab active" data-filter="all">All <span id="count-all"></span></button>
+          <button class="tab" data-filter="your-turn">Your turn <span id="count-your-turn"></span></button>
+          <button class="tab" data-filter="awaiting">Awaiting counterparty <span id="count-awaiting"></span></button>
+        </div>
+
+        <div class="card">
+          <table class="matters-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Matter</th>
+                <th>Counterparty</th>
+                <th>Status</th>
+                <th>Last Activity</th>
+                <th>Last Actor</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="matters-tbody">
+              <tr><td colspan="7" class="loading-row">Loading negotiations…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- New negotiation modal -->
+  <div class="modal-backdrop" id="new-modal" style="display:none;">
+    <div class="modal">
+      <h2>New negotiation</h2>
+      <p class="sub">Start a matter, then invite the counterparty.</p>
+      <form id="new-matter-form">
+        <div class="field">
+          <label for="nm-title">Matter title</label>
+          <input type="text" id="nm-title" required placeholder="e.g. MSA — Northwind Logistics" />
+        </div>
+        <div class="field">
+          <label for="nm-desc">Description (optional)</label>
+          <textarea id="nm-desc" placeholder="What's this agreement for?"></textarea>
+        </div>
+        <div class="field">
+          <label for="nm-counterparty-id">Counterparty user ID (optional)</label>
+          <input type="text" id="nm-counterparty-id" placeholder="Their Supabase user UUID" />
+          <div class="hint">You can also add the counterparty later from the matter page. This field takes a user ID rather than an email — invite-by-email isn't wired up on the backend yet.</div>
+        </div>
+        <div class="error-text" id="new-matter-error" style="display:none;"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="new-matter-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="new-matter-submit">Create negotiation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="api.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

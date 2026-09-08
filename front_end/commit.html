@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Commit New Version — Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <nav class="sidebar" id="sidebar"></nav>
+
+    <div>
+      <div class="topbar">
+        <input class="search-input" type="text" placeholder="Search negotiations, counterparties…" />
+        <div class="topbar-spacer"></div>
+        <button class="btn btn-primary" onclick="window.location.href='dashboard.html'">+ New Negotiation</button>
+        <button class="icon-btn" title="Notifications">🔔</button>
+      </div>
+
+      <main class="main" style="max-width: 640px;">
+        <div class="page-header">
+          <div class="breadcrumb">
+            <a href="dashboard.html">Active Negotiations</a> / <a id="crumb-matter" href="#">…</a> / Commit New Version
+          </div>
+          <h1 class="page-title">Commit New Version</h1>
+          <p class="page-subtitle">Upload your redlined .docx and let the counterparty know what changed.</p>
+        </div>
+
+        <div class="card" style="padding: 22px;">
+          <form id="commit-form">
+            <div class="field">
+              <label>Branching from</label>
+              <div class="branch-box" id="branch-box"><span class="doc-ic"></span>Loading…</div>
+            </div>
+
+            <div class="field">
+              <label>Upload edited document (.docx)</label>
+              <div class="dropzone" id="dropzone">
+                <div class="dz-icon"></div>
+                <div class="dz-text">Drag and drop your Word file here, or <a id="browse-link">browse</a></div>
+                <div class="dz-sub">Track Changes will be preserved automatically.</div>
+                <input type="file" id="file-input" accept=".docx" style="display:none;" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="commit-message">Commit message</label>
+              <textarea id="commit-message" placeholder='e.g. "Accepted indemnity cap, added carve-out language in 8.3 for willful misconduct."'></textarea>
+            </div>
+
+            <div class="field toggle-row">
+              <div class="toggle-copy">
+                <div class="t-title">Notify counterparty immediately</div>
+                <div class="t-sub" id="notify-sub">They'll get an email + in-app alert.</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="notify-toggle" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="error-text" id="commit-error" style="display:none;"></div>
+
+            <div class="modal-actions" style="margin-top: 10px;">
+              <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
+              <button type="submit" class="btn btn-primary" id="commit-submit" disabled>Commit Version →</button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="api.js"></script>
+  <script src="commit.js"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Compare Versions — Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <nav class="sidebar" id="sidebar"></nav>
+
+    <div>
+      <div class="topbar">
+        <input class="search-input" type="text" placeholder="Search negotiations, counterparties…" />
+        <div class="topbar-spacer"></div>
+        <button class="btn btn-primary" onclick="window.location.href='dashboard.html'">+ New Negotiation</button>
+        <button class="icon-btn" title="Notifications">🔔</button>
+      </div>
+
+      <main class="main">
+        <div class="page-header">
+          <div class="breadcrumb"><a href="dashboard.html">Active Negotiations</a> / <a id="crumb-matter" href="#">…</a></div>
+          <h1 class="page-title">Compare Versions</h1>
+          <p class="page-subtitle">Review the redline between any two versions, then finalize and send for signature.</p>
+        </div>
+
+        <div class="compare-select-row">
+          <div class="field" style="margin-bottom:0;">
+            <label>Comparing from</label>
+            <select id="from-select"></select>
+          </div>
+          <div class="compare-arrow">→</div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Comparing to</label>
+            <select id="to-select"></select>
+          </div>
+        </div>
+
+        <div class="compare-panels">
+          <div class="compare-panel">
+            <div class="panel-label" id="from-label">FROM</div>
+            <div id="from-diff"><div class="loading-row">Loading…</div></div>
+          </div>
+          <div class="compare-panel">
+            <div class="panel-label" id="to-label">TO</div>
+            <div id="to-diff"><div class="loading-row">Loading…</div></div>
+          </div>
+        </div>
+
+        <div class="bottom-cards">
+          <div class="card card-inner">
+            <h3>Mark as final</h3>
+            <p>Locks this version as the executed version. No further commits allowed once both parties confirm.</p>
+            <div class="card-inner-actions">
+              <button class="btn btn-secondary btn-sm" id="not-yet-btn">Not yet</button>
+              <button class="btn btn-primary btn-sm" id="mark-final-btn">Mark as final</button>
+            </div>
+          </div>
+
+          <div class="card card-inner">
+            <h3>Send for e-signature</h3>
+            <p id="sig-sub">Track signer status once this version is sent out.</p>
+            <div class="stepper" id="stepper"></div>
+            <div id="signer-list"></div>
+            <div class="card-inner-actions" id="sig-actions"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="api.js"></script>
+  <script src="compare.js"></script>
+</body>
+</html>

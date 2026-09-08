@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Matter — Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <nav class="sidebar" id="sidebar"></nav>
+
+    <div>
+      <div class="topbar">
+        <input class="search-input" type="text" placeholder="Search negotiations, counterparties…" />
+        <div class="topbar-spacer"></div>
+        <button class="btn btn-primary" onclick="window.location.href='dashboard.html'">+ New Negotiation</button>
+        <button class="icon-btn" title="Notifications">🔔</button>
+      </div>
+
+      <main class="main">
+        <div class="page-header">
+          <div class="breadcrumb"><a href="dashboard.html">Active Negotiations</a> / <span id="crumb-title">…</span></div>
+          <div class="header-row">
+            <div>
+              <h1 class="page-title" id="matter-title">Loading…</h1>
+              <p class="page-subtitle" id="matter-meta"></p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" id="compare-btn" disabled>Compare selected</button>
+              <button class="btn btn-primary" id="commit-btn">Commit New Version</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="banner-slot"></div>
+
+        <div class="matter-body">
+          <div>
+            <div class="timeline" id="timeline">
+              <div class="loading-row">Loading version history…</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="side-panel-card">
+              <h4>PARTIES</h4>
+              <div id="parties-list">—</div>
+            </div>
+            <div class="side-panel-card">
+              <h4 id="comments-title">COMMENTS</h4>
+              <div id="comments-list">—</div>
+              <form class="comment-form" id="comment-form">
+                <textarea id="comment-input" placeholder="Add a comment…"></textarea>
+                <button type="submit" class="btn btn-primary btn-sm">Post</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="api.js"></script>
+  <script src="matter.js"></script>
+</body>
+</html>
