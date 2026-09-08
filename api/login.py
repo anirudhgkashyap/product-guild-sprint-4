@@ -2,6 +2,7 @@ import os
 from fastapi import APIRouter, HTTPException, status
 from gotrue.errors import AuthApiError
 from supabase import Client, create_client
+from .models import SignupRequest
 
 # 1. Instantiate client globally to reuse connection pooling
 SUPABASE_URL = os.getenv("SUPABASE_URL")
