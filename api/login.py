@@ -146,14 +146,3 @@ def signup(payload: SignupRequest):
             status_code=500,
             detail=f"SIGNUP DEBUG ERROR: {type(e).__name__}: {str(e)}",
         )
-
-    # If Supabase email confirmation is disabled, a session is
-    # immediately returned. Otherwise the user must verify their email.
-    if response.session:
-        result["access_token"] = response.session.access_token
-        result["refresh_token"] = response.session.refresh_token
-        result["email_confirmation_required"] = False
-    else:
-        result["email_confirmation_required"] = True
-
-    return result
