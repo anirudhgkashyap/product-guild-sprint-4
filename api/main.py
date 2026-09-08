@@ -22,6 +22,10 @@ from . import matters, versions, signatures
 from .login import router as auth_router
 app = FastAPI(title="Contract Negotiation Platform API")
 
+
+@app.get("/api/test")
+def test():
+    return {"status": "python-function-is-running"}
 from fastapi.middleware.cors import CORSMiddleware
 
 
