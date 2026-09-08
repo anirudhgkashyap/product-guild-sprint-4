@@ -50,27 +50,23 @@ def login(payload: LoginRequest):
         Authorization: Bearer <access_token>
     """
 
-        try:
+    try:
         supabase = create_client(
             SUPABASE_URL,
             SUPABASE_PUBLISHABLE_KEY,
         )
 
-        response = supabase.auth.sign_up(
+        response = supabase.auth.sign_in_with_password(
             {
                 "email": payload.email,
                 "password": payload.password,
-                "options": {
-                    "data": {
-                        "full_name": payload.full_name,
-                    }
-                },
             }
         )
+
     except Exception as e:
         raise HTTPException(
-            status_code=400,
-            detail=f"Supabase signup error: {str(e)}",
+            status_code=401,
+            detail=f"Supabase login error: {str(e)}",
         )
 
     if response.user is None or response.session is None:
@@ -103,12 +99,12 @@ def signup(payload: SignupRequest):
     the user's metadata.
     """
 
-    supabase = create_client(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY,
-    )
-
     try:
+        supabase = create_client(
+            SUPABASE_URL,
+            SUPABASE_PUBLISHABLE_KEY,
+        )
+
         response = supabase.auth.sign_up(
             {
                 "email": payload.email,
@@ -120,10 +116,11 @@ def signup(payload: SignupRequest):
                 },
             }
         )
+
     except Exception as e:
         raise HTTPException(
             status_code=400,
-            detail=str(e),
+            detail=f"Supabase signup error: {str(e)}",
         )
 
     if response.user is None:
