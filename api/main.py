@@ -22,7 +22,6 @@ from . import matters, versions, signatures
 from .login import router as auth_router
 
 app = FastAPI(title="Contract Negotiation Platform API")
-app.include_router(auth_router)
 
 @app.get("/api/test")
 def test():
