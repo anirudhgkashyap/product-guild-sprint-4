@@ -93,18 +93,16 @@ def login(payload: LoginRequest):
 def signup(payload: SignupRequest):
     """
     Create a new Supabase Auth user.
-
-    The database trigger in supabase_schema.sql automatically creates
-    the corresponding public.profiles row and copies full_name from
-    the user's metadata.
     """
 
     try:
+        # Step 1: create Supabase client
         supabase = create_client(
             SUPABASE_URL,
             SUPABASE_PUBLISHABLE_KEY,
         )
 
+        # Step 2: contact Supabase Auth
         response = supabase.auth.sign_up(
             {
                 "email": payload.email,
@@ -117,24 +115,37 @@ def signup(payload: SignupRequest):
             }
         )
 
+        # Step 3: verify response
+        if response.user is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Supabase returned no user",
+            )
+
+        result = {
+            "user": {
+                "id": response.user.id,
+                "email": response.user.email,
+            }
+        }
+
+        if response.session:
+            result["access_token"] = response.session.access_token
+            result["refresh_token"] = response.session.refresh_token
+            result["email_confirmation_required"] = False
+        else:
+            result["email_confirmation_required"] = True
+
+        return result
+
+    except HTTPException:
+        raise
+
     except Exception as e:
         raise HTTPException(
-            status_code=400,
-            detail=f"Supabase signup error: {str(e)}",
+            status_code=500,
+            detail=f"SIGNUP DEBUG ERROR: {type(e).__name__}: {str(e)}",
         )
-
-    if response.user is None:
-        raise HTTPException(
-            status_code=400,
-            detail="Unable to create account",
-        )
-
-    result = {
-        "user": {
-            "id": response.user.id,
-            "email": response.user.email,
-        }
-    }
 
     # If Supabase email confirmation is disabled, a session is
     # immediately returned. Otherwise the user must verify their email.
