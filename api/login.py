@@ -50,22 +50,27 @@ def login(payload: LoginRequest):
         Authorization: Bearer <access_token>
     """
 
-    supabase = create_client(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY,
-    )
+        try:
+        supabase = create_client(
+            SUPABASE_URL,
+            SUPABASE_PUBLISHABLE_KEY,
+        )
 
-    try:
-        response = supabase.auth.sign_in_with_password(
+        response = supabase.auth.sign_up(
             {
                 "email": payload.email,
                 "password": payload.password,
+                "options": {
+                    "data": {
+                        "full_name": payload.full_name,
+                    }
+                },
             }
         )
-    except Exception:
+    except Exception as e:
         raise HTTPException(
-            status_code=401,
-            detail="Invalid email or password",
+            status_code=400,
+            detail=f"Supabase signup error: {str(e)}",
         )
 
     if response.user is None or response.session is None:
