@@ -16,8 +16,8 @@ from supabase import create_client
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
-SUPABASE_URL = os.environ["SUPABASE_URL"]
-SUPABASE_PUBLISHABLE_KEY = os.environ["SUPABASE_PUBLISHABLE_KEY"]
+SUPABASE_URL = os.environ["https://yqxlggragsgivrdkiwft.supabase.co"]
+SUPABASE_PUBLISHABLE_KEY = os.environ["sb_publishable_bI6XJEemKtoh6N5-1xg3NA_X78hTtMh"]
 
 
 # -------------------------------------------------------------------
